@@ -1,0 +1,73 @@
+{
+    "Cafe": {
+        "enabled": true
+    },
+    "Lesson": {
+        "enabled": true,
+        "locations": [
+            { "location": "Schale Office", "amount": 7 },
+            { "location": "None", "amount": 0 },
+            { "location": "None", "amount": 0 },
+            { "location": "None", "amount": 0 },
+            { "location": "None", "amount": 0 },
+            { "location": "None", "amount": 0 },
+            { "location": "None", "amount": 0 }
+        ]
+    },
+    "Club": {
+        "enabled": true
+    },
+    "Daily Pack": {
+        "enabled": true
+    },
+    "Missions": {
+        "enabled": true,
+        "presets": [
+            {"amount": 3 },
+            {"amount": 0 },
+            {"amount": 0 },
+            {"amount": 0 },
+            {"amount": 0 },
+            {"amount": 0 },
+            {"amount": 0 }
+        ]
+    },
+    "Bounty": {
+        "enabled": true,
+        "Overpass": 6,
+        "Desert Railroad": 0,
+        "Classroom": 0
+    },
+    "Commission": {
+        "enabled": true,
+        "Base Defence": 3,
+        "Item Retrieval": 0
+        
+    },
+    "Scrimmage": {
+        "enabled": true,
+        "Trinity": 6,
+        "Gehenna": 0,
+        "Millennium": 0
+    },
+    "Tactical Challenge": {
+        "enabled": true
+    },
+    "Shop": {
+        "enabled": true
+    },
+    "Recharge": {
+        "enabled": false,
+        "amount": 1
+    },
+    "Event": {
+        "enabled": true,
+        "amount": 99
+    },
+    "Tasks": {
+        "enabled": true
+    },
+    "Mail": {
+        "enabled": true
+    }
+}

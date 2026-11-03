@@ -1,4 +1,5 @@
 ﻿#Requires AutoHotkey v2.0
+#Include JSON.ahk
 #SingleInstance Force
 
 ; Target process name for the official Steam client
@@ -575,41 +576,53 @@ mainMenu() {
     Sleep(3500)
 }
 
+;-----------load config.json---------------
+
+config := "config.json"
+if !FileExist(config) {
+    MsgBox("missing config.json! check for the default config.json file in the selected release: https://github.com/Treason255/Blue-Archive-Macro/releases")
+} else {
+    data := JSON.Parse(FileRead(config))
+}
+
+;------------------ui----------------------
+
 ui := Gui("+AlwaysOnTop +Owner", "BA macro")
 tabs := ui.Add("Tab3","w600 h300", ["Cafe", "Lesson", "Club", "Daily Pack", "Missions", "Bounty", "Commission", "Scrimmage", "Tactical Challenge", "Shop", "Recharge", "Event", "Tasks", "Mail"])
 
 ;run
 tabs.UseTab(0)
-ui.Add("Button", "default", "Run").OnEvent("Click", runMacro)
-
+ui.Add("Button", "default Section", "Run").OnEvent("Click", runMacro)
+ui.Add("Button", "default x+525 ys", "Save").OnEvent("Click", saveData)
 ;cafe
 tabs.UseTab(1)
 cafeInput := ui.Add("Checkbox",, "Enabled")
-cafeInput.Value := 1
+cafeInput.Value := data["Cafe"]["enabled"]
 
 ;lesson
 tabs.UseTab(2)
 lessonInput := ui.Add("Checkbox",, "Enabled")
-lessonInput.Value := 1
+lessonInput.Value := data["Lesson"]["enabled"]
 
 lessonObjs := []
 lessoncountObjs := []
 
-ui.Add("Text", "Section", "Area: ")
+ui.Add("Text", "Section", "Location: ")
 lesson1 := ui.Add("DropDownList", "x+10", ["Schale Office", "Schale Residence Hall", "Gehhenna Hub", "Abydos Main Building", "Millennium Study Center", "Trinity Plaza Area", "Red Winter Federal Academy", "Hyakkiyako Central Area", "D.U. Shiratori City", "Shanhaijing Main Special Zone", "Haruhabara Electric Town", "Wildhunt Integrated Arts District"])
-lesson1.Choose("Schale Office")
+lesson1.Choose(data["Lesson"]["locations"][1]["location"])
 ui.Add("Text", "x+40", "Lessons: ")
-lesson1count := ui.Add("Edit", "x+10 Number" , 1)
+lesson1count := ui.Add("Edit", "x+10 Number" , data["Lesson"]["locations"][1]["amount"])
 ui.Add("UpDown","Range1-7", 7)
+
 
 lessonObjs.Push(lesson1)
 lessoncountObjs.Push(lesson1count)
 loop 6 {
-    ui.Add("Text", "xs", "Area: ")
+    ui.Add("Text", "xs", "Location: ")
     lessonn := ui.Add("DropDownList","x+10", ["None", "Schale Office", "Schale Residence Hall", "Gehhenna Hub", "Abydos Main Building", "Millennium Study Center", "Trinity Plaza Area", "Red Winter Federal Academy", "Hyakkiyako Central Area", "D.U. Shiratori City", "Shanhaijing Main Special Zone", "Haruhabara Electric Town", "Wildhunt Integrated Arts District"])
-    lessonn.Choose("None")
+    lessonn.Choose(data["Lesson"]["locations"][A_Index + 1]["location"])
     ui.Add("Text", "x+40", "Lessons: ")
-    lessonncount := ui.Add("Edit", "x+10 Number" , 0)
+    lessonncount := ui.Add("Edit", "x+10 Number" , data["Lesson"]["locations"][A_Index + 1]["amount"])
     ui.Add("UpDown","Range0-6", 0)
 
     lessonObjs.Push(lessonn)
@@ -619,28 +632,29 @@ loop 6 {
 ;club
 tabs.UseTab(3)
 clubInput := ui.Add("Checkbox",, "Enabled")
-clubInput.Value := 1
+clubInput.Value := data["Club"]["enabled"]
 
 ;pack
 tabs.UseTab(4)
 packInput := ui.Add("Checkbox",, "Enabled")
-packInput.Value := 1
+packInput.Value := data["Daily Pack"]["enabled"]
 
 ;mission
 tabs.UseTab(5)
 missionInput := ui.Add("Checkbox",, "Enabled")
-missionInput.Value := 1
+missionInput.Value := data["Missions"]["enabled"]
 
 missionObjs := []
 ui.Add("Text", "Section", "Preset 1: ")
 mission1 := ui.Add("Edit", "x+10 Number" , 99)
-ui.Add("UpDown","Range0-99", 3)
+ui.Add("UpDown","Range1-99", data["Missions"]["presets"][1]["amount"])
 
 missionObjs.Push(mission1)
 loop 6 {
     ui.Add("Text", "xs", "Preset " . (A_Index + 1) . ": ")
     missionn := ui.Add("Edit", "x+10 Number" , 99)
-    ui.Add("UpDown","Range0-99", 0)
+    ui.Add("UpDown","Range0-99", data["Missions"]["presets"][A_Index + 1]["amount"])
+
 
     missionObjs.Push(missionn)
 }
@@ -648,99 +662,109 @@ loop 6 {
 ;bounty
 tabs.UseTab(6)
 bountyInput := ui.Add("Checkbox",, "Enabled")
-bountyInput.Value := 1
+bountyInput.Value := data["Bounty"]["enabled"]
 
 bountyObjs := []
 
 ui.Add("Text", "Section", "Overpass: ")
 overpass := ui.Add("Edit", "x+10 Number" , 1)
-ui.Add("UpDown"," Range0-6", 6)
+ui.Add("UpDown"," Range0-6", data["Bounty"]["Overpass"])
 
 ui.Add("Text", "xs", "Desert Railroad: ")
 desertrailroad := ui.Add("Edit", "x+10 Number" , 1)
-ui.Add("UpDown"," Range0-6", 0)
+ui.Add("UpDown"," Range0-6", data["Bounty"]["Desert Railroad"])
 
 ui.Add("Text", "xs", "Classroom: ")
 classroom := ui.Add("Edit", "x+10 Number" , 1)
-ui.Add("UpDown"," Range0-6", 0)
+ui.Add("UpDown"," Range0-6", data["Bounty"]["Classroom"])
 
 bountyObjs.Push(overpass, desertrailroad, classroom)
 
 ;commission
 tabs.UseTab(7)
 commissionInput := ui.Add("Checkbox",, "Enabled")
-commissionInput.Value := 1
+commissionInput.Value := data["Commission"]["enabled"]
 
 commissionObjs := []
 
 ui.Add("Text","Section", "Base Defence: ")
 basedefence := ui.Add("Edit", "x+10 Number" , 99)
-ui.Add("UpDown"," Range0-99", 3)
+ui.Add("UpDown"," Range0-99", data["Commission"]["Base Defence"])
 
 ui.Add("Text","xs", "Item Retrieval: ")
 itemretrieval := ui.Add("Edit", "x+10 Number" , 99)
-ui.Add("UpDown"," Range0-99", 0)
+ui.Add("UpDown"," Range0-99", data["Commission"]["Item Retrieval"])
 
 commissionObjs.Push(basedefence, itemretrieval)
 
 ;scrimmage
 tabs.UseTab(8)
 scrimmageInput := ui.Add("Checkbox",, "Enabled")
-scrimmageInput.Value := 1
+scrimmageInput.Value := data["Scrimmage"]["enabled"]
 
 scrimmageObjs := []
 
 ui.Add("Text","Section", "Trinity: ")
 trinity := ui.Add("Edit", "x+30 Number" , 1)
-ui.Add("UpDown"," Range0-6", 6)
+ui.Add("UpDown"," Range0-6", data["Scrimmage"]["Trinity"])
 
 ui.Add("Text","xs", "Gehenna: ")
 gehenna := ui.Add("Edit", "x+30 Number" , 1)
-ui.Add("UpDown"," Range0-6", 0)
+ui.Add("UpDown"," Range0-6", data["Scrimmage"]["Gehenna"])
 
 ui.Add("Text","xs", "Millennium: ")
 millennium := ui.Add("Edit", "x+30 Number" , 1)
-ui.Add("UpDown"," Range0-6", 0)
+ui.Add("UpDown"," Range0-6", data["Scrimmage"]["Millennium"])
 
 scrimmageObjs.Push(trinity, gehenna, millennium)
 
 ;tactical
 tabs.UseTab(9)
 tacticalInput := ui.Add("Checkbox",, "Enabled")
-tacticalInput.Value := 1
+tacticalInput.Value := data["Tactical Challenge"]["enabled"]
 
 ;shop
 tabs.UseTab(10)
 shopInput := ui.Add("Checkbox",, "Enabled")
-shopInput.Value := 1
+shopInput.Value := data["Shop"]["enabled"]
 
 ;recharge
 tabs.UseTab(11)
 rechargeInput := ui.Add("Checkbox",, "Enabled")
+rechargeInput.Value := data["Recharge"]["enabled"]
 
 ui.Add("Text", "Section", "Recharges: ")
 recharges := ui.Add("Edit", "x+30 Number" , 1)
-ui.Add("UpDown"," Range1-3", 1)
+ui.Add("UpDown"," Range1-3", data["Recharge"]["amount"])
 
 ;event
 tabs.UseTab(12)
 eventInput := ui.Add("Checkbox",, "Enabled")
+eventInput.Value := data["Event"]["enabled"]
 
 ui.Add("Text", "Section", "Sweeps:")
-events := ui.Add("Edit", "x+30 Number" , 19)
-ui.Add("UpDown"," Range1-99", 99)
-
-ui.Show("NoActivate")
+events := ui.Add("Edit", "x+30 Number" , 10)
+ui.Add("UpDown"," Range1-99", data["Event"]["amount"])
 
 ;tasks
 tabs.UseTab(13)
 tasksInput := ui.Add("Checkbox",, "Enabled")
-tasksInput.Value := 1
+tasksInput.Value := data["Tasks"]["enabled"]
 
 ;mail
 tabs.UseTab(14)
 mailInput := ui.Add("Checkbox",, "Enabled")
-mailInput.Value := 1
+mailInput.Value := data["Mail"]["enabled"]
+
+ui.Show("NoActivate")
+
+;---------------save config----------------
+
+saveData(*) {
+    MsgBox("fake save")
+}
+
+;----------------run macro-----------------
 
 runMacro(*) {
     global TargetExe
