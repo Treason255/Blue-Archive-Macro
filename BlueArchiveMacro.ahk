@@ -210,7 +210,7 @@ recharge(ammount) {
     Sleep(2000)
     ClickClient(960, 890) ; claim
     VerifyStep("AP Recharge Complete")
-    Sleep(2500)
+    Sleep(3000)
 }
 
 tasks() {
@@ -353,7 +353,7 @@ mission(presets, ammounts) {
 
     ClickClient(75, 75) ; exit mission
     VerifyStep("Missions Complete")
-    Sleep(1500)
+    Sleep(2000)
 
 }
 
@@ -411,7 +411,7 @@ bounty(bounties, ammounts) {
 
     ClickClient(75, 75) ; exit bounty
     VerifyStep("Bounties Complete")
-    Sleep(1500)
+    Sleep(2000)
 }
 
 commission(commissions, ammounts) {
@@ -466,7 +466,7 @@ commission(commissions, ammounts) {
 
     ClickClient(75, 75) ; exit commission
     VerifyStep("Commissions Complete")
-    Sleep(1500)
+    Sleep(2000)
 }
 
 scrimmage(scrimmages, ammounts) {
