@@ -44,6 +44,9 @@ lesson(locations, ammounts) {
             continue
         }
         location := locations.Get(A_Index)
+        if A_Index != 1 { ; selection lowk returns 1-13 for selections 2-7 and this is the quickest fix
+            location -= 1
+        }
         loop { ; loop until requested lesson is selected
             distance := GetClosest(location, currentLesson)
             if distance == 1 {
@@ -611,8 +614,8 @@ ui.Add("Text", "Section", "Location: ")
 lesson1 := ui.Add("DropDownList", "x+10", ["Schale Office", "Schale Residence Hall", "Gehhenna Hub", "Abydos Main Building", "Millennium Study Center", "Trinity Plaza Area", "Red Winter Federal Academy", "Hyakkiyako Central Area", "D.U. Shiratori City", "Shanhaijing Main Special Zone", "Haruhabara Electric Town", "Wildhunt Integrated Arts District"])
 lesson1.Choose(data["Lesson"]["locations"][1]["location"])
 ui.Add("Text", "x+40", "Lessons: ")
-lesson1count := ui.Add("Edit", "x+10 Number" , data["Lesson"]["locations"][1]["amount"])
-ui.Add("UpDown","Range1-7", 7)
+lesson1count := ui.Add("Edit", "x+10 Number" , 0)
+ui.Add("UpDown","Range1-7", data["Lesson"]["locations"][1]["amount"])
 
 
 lessonObjs.Push(lesson1)
@@ -622,8 +625,8 @@ loop 6 {
     lessonn := ui.Add("DropDownList","x+10", ["None", "Schale Office", "Schale Residence Hall", "Gehhenna Hub", "Abydos Main Building", "Millennium Study Center", "Trinity Plaza Area", "Red Winter Federal Academy", "Hyakkiyako Central Area", "D.U. Shiratori City", "Shanhaijing Main Special Zone", "Haruhabara Electric Town", "Wildhunt Integrated Arts District"])
     lessonn.Choose(data["Lesson"]["locations"][A_Index + 1]["location"])
     ui.Add("Text", "x+40", "Lessons: ")
-    lessonncount := ui.Add("Edit", "x+10 Number" , data["Lesson"]["locations"][A_Index + 1]["amount"])
-    ui.Add("UpDown","Range0-6", 0)
+    lessonncount := ui.Add("Edit", "x+10 Number" , 0)
+    ui.Add("UpDown","Range0-6", data["Lesson"]["locations"][A_Index + 1]["amount"])
 
     lessonObjs.Push(lessonn)
     lessoncountObjs.Push(lessonncount)
@@ -761,7 +764,50 @@ ui.Show("NoActivate")
 ;---------------save config----------------
 
 saveData(*) {
-    MsgBox("fake save")
+    data["Cafe"]["enabled"] := cafeInput.Value
+    data["Lesson"]["enabled"] := lessonInput.Value
+    data["Club"]["enabled"] := clubInput.Value
+    data["Daily Pack"]["enabled"] := packInput.Value
+    data["Missions"]["enabled"] := missionInput.Value
+    data["Bounty"]["enabled"] := bountyInput.Value
+    data["Commission"]["enabled"] := commissionInput.Value
+    data["Scrimmage"]["enabled"] := scrimmageInput.Value
+    data["Tactical Challenge"]["enabled"] := tacticalInput.Value
+    data["Shop"]["enabled"] := shopInput.Value
+    data["Recharge"]["enabled"] := rechargeInput.Value
+    data["Event"]["enabled"] := eventInput.Value
+    data["Tasks"]["enabled"] := tasksInput.Value
+    data["Mail"]["enabled"] := mailInput.Value
+
+    loop 7 {
+        data["Lesson"]["locations"][A_Index]["location"] := lessonObjs[A_Index].Value
+        data["Lesson"]["locations"][A_Index]["amount"] := lessoncountObjs[A_Index].Value
+
+        data["Missions"]["presets"][A_Index]["amount"] := missionObjs[A_Index].Value
+    }
+
+    data["Bounty"]["Overpass"] := overpass.Value
+    data["Bounty"]["Desert Railroad"] := desertrailroad.Value
+    data["Bounty"]["Classroom"] := classroom.Value
+
+    data["Commission"]["Base Defence"] := basedefence.Value
+    data["Commission"]["Item Retrieval"] := itemretrieval.Value
+
+    data["Scrimmage"]["Trinity"] := trinity.Value
+    data["Scrimmage"]["Gehenna"] := gehenna.Value
+    data["Scrimmage"]["Millennium"] := millennium.Value
+
+    data["Recharge"]["amount"] := recharges.Value
+    data["Event"]["amount"] := events.Value
+
+    try {
+        file := FileOpen(config, "w")
+        file.Write(JSON.Stringify(data))
+        file.Close()
+        VerifyStep("Saved data")
+    } catch Error as errorMsg {
+        MsgBox("Failed to save: " . errorMsg)
+    }
 }
 
 ;----------------run macro-----------------
