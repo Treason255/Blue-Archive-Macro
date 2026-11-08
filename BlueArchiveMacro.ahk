@@ -260,6 +260,8 @@ mail() {
     Sleep(500)
     ClickClient(960, 890) ; claim
     Sleep(1000)
+    ClickClient(960, 890) ; backup claim
+    Sleep(1000)
 
     ClickClient(75, 75) ; exit mail
     VerifyStep("Mail Complete")
