@@ -22,6 +22,8 @@ cafe() {
     Sleep(2000)
     ClickClient(960, 800)   ; confirm
     Sleep(1200)
+    ClickClient(1125, 890)   ; potential full
+    Sleep(1200)
 
     ClickClient(75, 75)     ; exit earnings
     Sleep(1000)
@@ -122,15 +124,17 @@ club() {
     Sleep(4000)    
 }
 
-dailyPack() {
+dailyPack() { ; reworked bruhh
     ClickClient(200, 333)
     VerifyStep("Starting Daily Pack")
     Sleep(5000)
-    ClickClient(1350, 270)  ; packs
+    ClickClient(180, 470)  ; general
     Sleep(1200)
-    ClickClient(575, 725)   ; purchase
+    ClickClient(575, 430)   ; purchase
     Sleep(1200)
     ClickClient(1125, 890)   ; confirm
+    Sleep(1200)
+    ClickClient(1125, 890)   ; potential full
     Sleep(2000)
     
     ClickClient(1125, 890)     ; exit popup
@@ -183,6 +187,8 @@ shop() {
     ClickClient(1150, 860) ; confirm
     Sleep(2000)
     ClickClient(960, 890) ; claim
+    Sleep(1200)
+    ClickClient(1125, 990)   ; potential full
     Sleep(1000)
 
     ClickClient(75, 75)     ; exit 
@@ -212,6 +218,8 @@ recharge(ammount) {
     ClickClient(1150, 760) ; confirm
     Sleep(2000)
     ClickClient(960, 890) ; claim
+    Sleep(1200)
+    ClickClient(1125, 890)   ; potential full
     VerifyStep("AP Recharge Complete")
     Sleep(3000)
 }
@@ -262,6 +270,8 @@ mail() {
     Sleep(1000)
     ClickClient(960, 890) ; backup claim
     Sleep(1000)
+    ClickClient(960, 890) ; double backup claim cause game thinks u dont know what to do with choice items
+    Sleep(1000)
 
     ClickClient(75, 75) ; exit mail
     VerifyStep("Mail Complete")
@@ -273,7 +283,7 @@ event(ammount) {
     VerifyStep("Starting Event")
     Sleep(3500)
 
-    ClickClient(1400, 160) ; quest
+    ClickClient(1620, 160) ; quest(3 tab: 1400, 160   2 tab: 1620, 160)
     Sleep(1000)
     ClickClient(1700, 940) ; highest
     Sleep(1000)
