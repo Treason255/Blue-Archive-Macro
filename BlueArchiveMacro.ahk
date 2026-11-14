@@ -279,7 +279,13 @@ mail() {
 }
 
 event(ammount) {
-    ClickClient(1780, 300)
+    if location == "main" { ;reset/go to campaign
+        campaign()
+    } else if location == "campaign" {
+        mainMenu()
+        campaign()
+    }
+    ClickClient(150, 250)
     VerifyStep("Starting Event")
     Sleep(3500)
 
@@ -318,11 +324,13 @@ event(ammount) {
     ClickClient(75, 75) ; exit event
     VerifyStep("Event Complete")
     Sleep(3500)
+    mainMenu()
 }
 
 campaign() {
     ClickClient(1775, 940)  ; campaign
     VerifyStep("Entering Campaign")
+    location := "campaign"
     Sleep(3500)
 }
 
@@ -588,6 +596,7 @@ tactical() {
 mainMenu() {
     ClickClient(75, 75)  ; main menu
     VerifyStep("Entering Main Menu")
+    location := "main"
     Sleep(3500)
 }
 
@@ -839,7 +848,7 @@ runMacro(*) {
 
     Sleep(1000)
 
-    location := "main"
+    global location := "main"
 
     ; Coordinates are mapped for a 1920x1080 windowed client
 
@@ -869,7 +878,6 @@ runMacro(*) {
     if missionInput.Value == 1 {
         if location == "main" {
             campaign()
-            location := "campaign"
         }
         missions := []
         loop 7 {
@@ -882,7 +890,6 @@ runMacro(*) {
     if bountyInput.Value == 1 {
         if location == "main" {
             campaign()
-            location := "campaign"
         }
         bounties := []
         loop 3 {
@@ -895,7 +902,6 @@ runMacro(*) {
     if commissionInput.Value == 1 {
         if location == "main" {
             campaign()
-            location := "campaign"
         }
         commissions := []
         loop 2 {
@@ -908,10 +914,8 @@ runMacro(*) {
     if scrimmageInput.Value == 1 {
         if location == "main" {
             campaign()
-            location := "campaign"
         }
         scrimmages := []
-        scrimmagecounts := []
         loop 3 {
             scrimmages.Push(scrimmageObjs.Get(A_Index).Value)
         }
@@ -922,7 +926,6 @@ runMacro(*) {
     if tacticalInput.Value == 1 {
         if location == "main" {
             campaign()
-            location := "campaign"
         }
         tactical()
     }
@@ -930,7 +933,6 @@ runMacro(*) {
     if shopInput.Value == 1 {
         if location == "campaign" {
             mainmenu()
-            location := "main"
         }
         shop() ; no selection system yet
     }
@@ -938,28 +940,18 @@ runMacro(*) {
     if rechargeInput.Value == 1 {
         if location == "campaign" {
             mainmenu()
-            location := "main"
         }
 
         recharge(recharges.Value)
     }
 
     if eventInput.Value == 1 {
-        if location == "campaign" {
-            mainmenu()
-            location := "main"
-        } else if location == "main" {
-            campaign()
-            mainMenu()
-        }
-
         event(events.Value)
     }
 
     if tasksInput.Value == 1 {
         if location == "campaign" {
             mainmenu()
-            location := "main"
         }
         tasks()
     }
@@ -967,7 +959,6 @@ runMacro(*) {
     if mailInput.Value == 1 {
         if location == "campaign" {
             mainmenu()
-            location := "main"
         }
         mail()
     }
