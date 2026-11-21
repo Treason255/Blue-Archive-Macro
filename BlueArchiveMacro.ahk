@@ -8,7 +8,7 @@ CoordMode("Mouse", "Client")
 
 ;----------------------------------------------------------------
 
-cafe() {
+cafe(cafe1Interact, cafe1Invite, cafe2Interact, cafe2Invite) {
     ClickClient(150, 975)  ; Open Cafe from lobby
     VerifyStep("Starting Cafe")
     Sleep(5000)            ; Wait for load
@@ -24,9 +24,80 @@ cafe() {
     Sleep(1200)
     ClickClient(1125, 890)   ; potential full
     Sleep(1200)
-
     ClickClient(75, 75)     ; exit earnings
     Sleep(1000)
+    
+    studentLocator9000() {
+        clicked := false
+        loop { ; if nest of doom and despair
+            try {
+                if ImageSearch(&foundX, &foundY, 0, 0, 1920, 1080, "*10 " . "Assets\CafeInteractBubble.png") {
+
+                    ClickClient(foundX + 70, foundY + 100)
+                    clicked := true
+                    Sleep(3500) ; fixme same long ass wait for rankup assumption make a damn checker please
+                } else {
+                    if clicked == true {
+                        ClickClient(960, 1000) ; potential relationship rankup
+                        Sleep(1500)
+                        ClickClient(960, 1000) ; potential rank title reward(20, 50, 100) 
+                        Sleep(1000)
+                        ClickClient(960, 840) ; confirm
+                        Sleep(1000)
+                        clicked := false
+                    } else {
+                        VerifyStep("No more students found")
+                        break
+                    }
+                }
+            } catch Error as errorMsg {
+                MsgBox("cafe student locator error: " . errorMsg.Message)
+                break
+            }
+        }
+        Sleep(1000)
+    }
+
+    studentInvitor9000(student) {
+        ClickClient(1330,970) ; invite
+        Sleep(1000)
+        ClickClient(950, 230) ; search
+        Sleep(500)
+        ClickClient(950, 330) ; search text box
+        Sleep(500)
+        SendText(student) ; searches for the student
+        Sleep(500)
+
+        ClickClient(1150, 430) ; click top result
+        /* note: top result is not always wanted student.
+        note: search box has a character limit of 10.
+        todo: find the string of text on the screen where the wanted student is, then click invite to the right. if not found, try to scroll somehow(might be needed for ui due to swimsuit alts)
+        todo: check for alt replacements(popup on attempt) and dupe invites(No. 1 or No. 2 text) */
+        Sleep(1000)
+        ClickClient(1150, 760) ; confirm
+        Sleep(1000)
+        ClickClient(960, 1000) ; skip
+        Sleep(1000)
+    }
+
+    if cafe1Interact {
+        if cafe1Invite != "" {
+            studentInvitor9000(cafe1Invite)
+        }
+        studentLocator9000()
+    }
+    
+    if cafe2Interact {
+        ClickClient(200, 150) ; cafe 2
+        Sleep(5000)            ; Wait for load
+        ClickClient(980, 980) ;clear visiting students notice
+        Sleep(1000)
+        if cafe2Invite != "" {
+            studentInvitor9000(cafe2Invite)
+        }
+        studentLocator9000()
+    }
+
     ClickClient(75, 75)     ; exit cafe
     VerifyStep("Cafe Complete")
     Sleep(4500)             ; wait for load
@@ -623,6 +694,23 @@ tabs.UseTab(1)
 cafeInput := ui.Add("Checkbox",, "Enabled")
 cafeInput.Value := data["Cafe"]["enabled"]
 
+ui.Add("Text", "Section", "Cafe 1")
+ui.Add("Text", "xs+20", "Interact: ")
+cafe1Interact := ui.Add("Checkbox", "x+10", "Enabled")
+cafe1Interact.Value := data["Cafe"]["cafe1"]["interact"]
+ui.Add("Text", "xs+20", "Invite: ")
+cafe1Invite := ui.Add("Edit", "x+10", "")
+cafe1Invite.Value := data["Cafe"]["cafe1"]["invite"]
+
+
+ui.Add("Text", "xs y+15", "Cafe 2")
+ui.Add("Text", "xs+20", "Interact: ")
+cafe2Interact := ui.Add("Checkbox", "x+10", "Enabled")
+cafe2Interact.Value := data["Cafe"]["cafe2"]["interact"]
+ui.Add("Text", "xs+20", "Invite: ")
+cafe2Invite := ui.Add("Edit", "x+10", "")
+cafe2Invite.Value := data["Cafe"]["cafe2"]["invite"]
+
 ;lesson
 tabs.UseTab(2)
 lessonInput := ui.Add("Checkbox",, "Enabled")
@@ -807,6 +895,11 @@ saveData(*) {
         data["Missions"]["presets"][A_Index]["amount"] := missionObjs[A_Index].Value
     }
 
+    data["Cafe"]["cafe1"]["interact"] := cafe1Interact.Value
+    data["Cafe"]["cafe1"]["invite"] := cafe1Invite.Value
+    data["Cafe"]["cafe2"]["interact"] := cafe2Interact.Value
+    data["Cafe"]["cafe2"]["invite"] := cafe2Invite.Value
+
     data["Bounty"]["Overpass"] := overpass.Value
     data["Bounty"]["Desert Railroad"] := desertrailroad.Value
     data["Bounty"]["Classroom"] := classroom.Value
@@ -853,7 +946,7 @@ runMacro(*) {
     ; Coordinates are mapped for a 1920x1080 windowed client
 
     if cafeInput.Value == 1 {
-        cafe() ; no invite or student relation click yet
+        cafe(cafe1Interact.Value, cafe1Invite.Value, cafe2Interact.Value, cafe2Invite.Value) ; invite and student relation click! wip
     }
 
     if lessonInput.Value == 1 {
