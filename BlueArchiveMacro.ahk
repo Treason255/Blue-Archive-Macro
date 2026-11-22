@@ -277,21 +277,31 @@ shop() {
 
     ClickClient(180, 425) ; tactical shop
     Sleep(500)
+    buyAP() {
+         ClickClient(1050, 360) ; lesser energy drink
+        Sleep(500)
+        ClickClient(1270, 360) ; normal energy drink
+        Sleep(1000)
 
-    ClickClient(1050, 360) ; lesser energy drink
-    Sleep(500)
-    ClickClient(1270, 360) ; normal energy drink
-    Sleep(1000)
-
-    ClickClient(1750, 1000) ; purchase selected
-    Sleep(1000)
-    ClickClient(1150, 860) ; confirm
-    Sleep(2000)
-    ClickClient(960, 890) ; claim
-    Sleep(1200)
-    ClickClient(1125, 990)   ; potential full
-    Sleep(1000)
-
+        ClickClient(1750, 1000) ; purchase selected
+        Sleep(1000)
+        ClickClient(1150, 860) ; confirm
+        Sleep(2000)
+        ClickClient(960, 890) ; claim
+        Sleep(1200)
+        ClickClient(1125, 990)   ; potential full
+        Sleep(1000)
+    }
+   
+    buyAP()
+    loop(3) {
+        ClickClient(1740, 990) ; refresh shop
+        Sleep(500)
+        ClickClient(1150, 720) ; confirm
+        Sleep(1000)
+        buyAP()
+    }
+    
     ClickClient(75, 75)     ; exit 
     VerifyStep("Shop Complete")
     Sleep(3000)
@@ -431,7 +441,7 @@ event(ammount) {
 campaign() {
     ClickClient(1775, 940)  ; campaign
     VerifyStep("Entering Campaign")
-    location := "campaign"
+    global location := "campaign"
     Sleep(3500)
 }
 
@@ -697,7 +707,7 @@ tactical() {
 mainMenu() {
     ClickClient(75, 75)  ; main menu
     VerifyStep("Entering Main Menu")
-    location := "main"
+    global location := "main"
     Sleep(3500)
 }
 
