@@ -1,5 +1,8 @@
-﻿#Requires AutoHotkey v2.0
-#Include JSON.ahk
+﻿; Blue Archive Macro v1.2 by Treason255
+
+#Requires AutoHotkey v2.0
+#Include Lib\JSON.ahk
+#Include Lib\OCR.ahk
 #SingleInstance Force
 
 ; Target process name for the official Steam client
@@ -31,9 +34,9 @@ cafe(cafe1Interact, cafe1Invite, cafe2Interact, cafe2Invite) {
         clicked := false
         loop { ; if nest of doom and despair
             try {
-                if ImageSearch(&foundX, &foundY, 0, 0, 1920, 1080, "*10 " . "Assets\CafeInteractBubble.png") {
+                if ImageSearch(&foundX, &foundY, 0, 0, 1920, 1080, "*10 Assets\CafeInteractBubble.png") {
 
-                    ClickClient(foundX + 70, foundY + 100)
+                    ClickClient(foundX + 60, foundY + 100)
                     clicked := true
                     Sleep(3500) ; fixme same long ass wait for rankup assumption make a damn checker please
                 } else {
@@ -62,20 +65,47 @@ cafe(cafe1Interact, cafe1Invite, cafe2Interact, cafe2Invite) {
         ClickClient(1330,970) ; invite
         Sleep(1000)
         ClickClient(950, 230) ; search
-        Sleep(500)
+        Sleep(800)
         ClickClient(950, 330) ; search text box
         Sleep(500)
         SendText(student) ; searches for the student
         Sleep(500)
+        ;note: search box has a character limit of 10.        
 
-        ClickClient(1150, 430) ; click top result
-        /* note: top result is not always wanted student.
-        note: search box has a character limit of 10.
-        todo: find the string of text on the screen where the wanted student is, then click invite to the right. if not found, try to scroll somehow(might be needed for ui due to swimsuit alts)
-        todo: check for alt replacements(popup on attempt) and dupe invites(No. 1 or No. 2 text) */
+        ; find student
+        searchingY := 370
+        loop {
+            if ImageSearch(&buttonX, &buttonY, 960, searchingY, 1300, 850, "*10 Assets\CafeInviteButton.png") {
+                nameX := buttonX - 360
+                nameY := buttonY - 15
+                nameW := 300
+                nameH := 50
+
+                text := OCR.FromRect(nameX, nameY, nameW, nameH, 3).Text
+                cleanText := StrLower(Trim(RegExReplace(text, "\s+", " ")))
+                target := StrLower(Trim(RegExReplace(student, "\s+", " ")))
+
+                if cleanText == target { 
+                    ClickClient(buttonX + 70, buttonY + 30)
+                    break
+                }
+
+                searchingY := buttonY + 70
+            } else {
+                MsgBox("no invite button found")
+            }
+        }
         Sleep(1000)
-        ClickClient(1150, 760) ; confirm
+
+        ; detect exchange popup
+        /* if ImageSearch(,, 950, 500, 955, 505, "*10 Assets\CafeReplaceStudent.png") {
+            
+        } */
+
         Sleep(1000)
+        ClickClient(1150, 760) ; confirm for now
+        Sleep(1000)
+        
         ClickClient(960, 1000) ; skip
         Sleep(1000)
     }
@@ -1078,6 +1108,7 @@ GetClosest(a, b) {
 ; Function to click relative to the inner game window (ignoring window title bar/borders)
 ClickClient(x, y) {
     global TargetExe
+    CoordMode("Pixel", "Client")
     CoordMode("Mouse", "Client") ; Coordinates relative to the active game window
     
     ; Physically move cursor to position, pause briefly, then click
