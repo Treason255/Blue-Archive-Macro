@@ -38,15 +38,12 @@ cafe(cafe1Interact, cafe1Invite, cafe2Interact, cafe2Invite) {
 
                     ClickClient(foundX + 60, foundY + 100)
                     clicked := true
-                    Sleep(3500) ; fixme same long ass wait for rankup assumption make a damn checker please
+                    Sleep(1000)
                 } else {
                     if clicked == true {
-                        ClickClient(960, 1000) ; potential relationship rankup
-                        Sleep(1500)
-                        ClickClient(960, 1000) ; potential rank title reward(20, 50, 100) 
-                        Sleep(1000)
-                        ClickClient(960, 840) ; confirm
-                        Sleep(1000)
+                        if !waitFor("Assets\DarkBlue.png",,, 1640, 930) {
+                            return "Could not confirm next screen to be ready"
+                        }
                         clicked := false
                     } else {
                         VerifyStep("No more students found")
@@ -54,7 +51,7 @@ cafe(cafe1Interact, cafe1Invite, cafe2Interact, cafe2Invite) {
                     }
                 }
             } catch Error as errorMsg {
-                MsgBox("cafe student locator error: " . errorMsg.Message)
+                MsgBox("Cafe student locator error: " . errorMsg.Message, "Error")
                 break
             }
         }
@@ -75,7 +72,7 @@ cafe(cafe1Interact, cafe1Invite, cafe2Interact, cafe2Invite) {
         ; find student
         searchingY := 370
         loop {
-            if ImageSearch(&buttonX, &buttonY, 960, searchingY, 1300, 850, "*10 Assets\CafeInviteButton.png") {
+            if ImageSearch(&buttonX, &buttonY, 960, searchingY, 1300, 850, "*10 Assets\BlueButton.png") {
                 nameX := buttonX - 360
                 nameY := buttonY - 15
                 nameW := 300
@@ -92,7 +89,7 @@ cafe(cafe1Interact, cafe1Invite, cafe2Interact, cafe2Invite) {
 
                 searchingY := buttonY + 70
             } else {
-                MsgBox("no invite button found")
+                MsgBox("no invite button found", "Error")
             }
         }
         Sleep(1000)
@@ -170,33 +167,40 @@ lesson(locations, ammounts) {
         
         ClickClient(1750, 1000) ; all locations
         Sleep(1000)
+        
+        lessonClicker9000(index) {
+            if !ImageSearch(&_,&__, 700, 720, 820, 820, "*10 Assets\White.png") { ; check for 8th lesson slot
+                index += 1
+            }
 
-        loop ammounts.Get(A_Index) { ; loops ammount per lesson
-            if A_Index == 1 {
+            if index == 8 {
                 ClickClient(500, 380)
-            } else if A_Index == 2 {
+            } else if index == 7 {
                 ClickClient(1000, 380)
-            } else if A_Index == 3 {
-                ClickClient(1500, 380)                    
-            } else if A_Index == 4 {
+            } else if index == 6 {
+                ClickClient(1500, 380)
+            } else if index == 5 {
                ClickClient(500, 600) 
-            } else if A_Index == 5 {
+            } else if index == 4 {
                ClickClient(1000, 600) 
-            } else if A_Index == 6 {
+            } else if index == 3 {
                ClickClient(1500, 600) 
-            } else if A_Index == 7 {
+            } else if index == 2 {
                ClickClient(500, 830) 
+            } else if index == 1 {
+                ClickClient(1000, 830)
             }
             Sleep(1000)
 
             ClickClient(960, 840) ; start lesson
-            Sleep(4000)
-            ClickClient(960, 540) ; potential relationship rankup
-            Sleep(1500)
-            ClickClient(960, 540) ; potential rank title reward(20, 50, 100) 
             Sleep(1000)
-            ClickClient(960, 840) ; confirm
-            Sleep(1000)
+            if !waitFor("Assets\BlueButton.png", 960, 540,760, 760,,, 10) {
+                MsgBox("Could not verify next screen", "Error")
+            }
+        }
+
+        loop ammounts.Get(A_Index) { ; loops ammount per lesson
+            lessonClicker9000(A_Index)
         }
 
         ClickClient(75, 75) ; exit sublocations
@@ -1113,6 +1117,21 @@ GetClosest(a, b) {
     } else if (dist_sub < dist_add) {
         return -1
     }
+}
+
+waitFor(targetImg, clickX := 960, clickY := 1000, x1 := 0, y1 := 0, x2 := A_ScreenWidth, y2 := A_ScreenHeight, requiredAccuracy := 25, maxAttempts := 20, pollInterval := 500) {
+    needle := requiredAccuracy > 0 ? "*" . requiredAccuracy . " " . targetImg : targetImg
+
+    loop maxAttempts {
+        if ImageSearch(&foundX, &foundY, x1, y1, x2, y2, needle) {
+            return true
+        }
+
+        ClickClient(clickX, clickY)
+        Sleep(pollInterval)
+    }
+
+    return false
 }
 
 ; Function to click relative to the inner game window (ignoring window title bar/borders)
